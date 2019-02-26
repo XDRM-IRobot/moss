@@ -1,0 +1,13 @@
+<launch>
+  <master auto="start"/>
+
+   <!-- Configure the car_config pack -->
+  <include file="$(find moss)/launch/car_config.launch"/>
+  
+  <!-- Run the slam -->  
+  <include file="$(find moss)/slam/slam_gmapping.xml"/>  
+ 
+  <!-- Run the rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find moss)/rviz/single_robot.rviz" />
+
+</launch>

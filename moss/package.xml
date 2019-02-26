@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package>
+  <name>moss</name>
+  <version>0.0.0</version>
+  <description>The  package</description>
+
+  <maintainer email="ubuntu@todo.todo">ubuntu</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>

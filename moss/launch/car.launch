@@ -1,0 +1,21 @@
+<launch>
+  <master auto="start"/>
+
+   <!-- Configure the car_config pack -->
+  <include file="$(find moss)/launch/car_config.launch"/>
+  
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find moss)/maps/RMmap.yaml">
+  </node>
+
+  <!-- Run the amcl location -->
+  <include file="$(find amcl)/examples/amcl_omni.launch"/>
+
+ <!-- Configure the move_base pack -->
+  <include file="$(find moss)/move_base/move_base.xml"/>
+
+  <!-- Run the rosbag -->
+  <!-- 
+  <node pkg="rosbag" type="record" name="bag_record" args="/cmd_vel" />
+  -->
+
+</launch>

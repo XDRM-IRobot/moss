@@ -1,0 +1,29 @@
+<launch>
+
+    <!-- Run the serial and  network-->
+    <include file="$(find moss_serial)/launch/serial.launch"/>
+    <include file="$(find moss_multiwar)/launch/multiwar.launch"/>
+
+    <!-- Run the armor detect -->
+    <node pkg="moss_camera" type="camera_node" name="camera_node" output="screen"/>
+    <node pkg="moss_detect" type="armor_detect_node" name="armor_detector" output="screen"/>
+
+    <!-- Run the rplidar -->
+    <node pkg="moss_rplidar" type="rplidarNode" name="rplidarNode" output="screen">
+        <param name="serial_port"         type="string" value="/dev/ttyUSB0"/>  
+        <param name="serial_baudrate"     type="int"    value="115200"/>
+        <param name="frame_id"            type="string" value="laser"/>
+        <param name="inverted"            type="bool"   value="false"/>
+        <param name="angle_compensate"    type="bool"   value="true"/>
+    </node>
+
+    <!-- Run the odometry -->
+    <node pkg="moss_odometry" type="vel2odom_node" name="odometry_publisher" output="screen"/>
+
+    <!-- Run the tf -->
+    <node pkg="moss_odometry"  type="tf_node" name="robot_tf_broadcaster" output="screen"/>
+
+    <!-- Run the brain -->
+    <node pkg="moss_decision"  type="decision_node" name="decision_node" output="screen"/>
+
+</launch>

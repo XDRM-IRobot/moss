@@ -1,0 +1,6 @@
+<launch>
+
+	<node pkg="moss_camera" type="camera_node"  name="camera_node"  output="screen" />
+	<node pkg="moss_detect" type="armor_detect_node"  name="armor_detect_node"  output="screen" />
+
+</launch>
