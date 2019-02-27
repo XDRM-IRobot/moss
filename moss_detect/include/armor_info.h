@@ -62,7 +62,7 @@ public:
 /**
  * @brief: 装甲板的位姿信息，发送给电控的信息
  */
-struct armor_pos
+struct armor_pos		//被取代
 {
 	int Flag;        // 标志位
 	double angle_x;  // Yaw角度

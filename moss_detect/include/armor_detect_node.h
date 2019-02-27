@@ -17,46 +17,69 @@
 
 #include <armor_info.h>
 #include <armor_detect.h>
+#include "angle_solver.h"
 
 #include <ros/ros.h>
-#include <moss_msgs/car_info.h>
-#include <moss_msgs/armor_info.h>
+#include <serial/car_info.h>
+#include <detect/armor_goal.h>
 
 namespace detect_mul
 {
 class armor_detect_node
 {
 public:
-    armor_detect_node()
+    armor_detect_node()     //构造函数
     {
-        ros::NodeHandle n;
-        image_transport::ImageTransport it(n);
-        sub_img_   = it.subscribe("camera_info", 5, 
-                        boost::bind(&armor_detect_node::armor_callback, this, _1));
+        ros::NodeHandle n;          //消息句柄  我记得好象是这样
+        image_transport::ImageTransport it(n);      //ros的图片发布流       这边的句柄和这个图片流的操作都是固定的
+        param_file_path("../../autocar_nav/vision/480P_120_RH.xml")
+        sub_img_   = it.subscribe("camera_info", 5,    //这边5不知道是啥意思                                 //这里subscribe是订阅消息   订阅的是camera_info节点发布的消息
+                        boost::bind(&armor_detect_node::armor_callback, this, _1));     //回调函数      
 
-        sub_yaw_   = n.subscribe<moss_msgs::car_info>("car_info",5, 
+        sub_yaw_   = n.subscribe<serial::car_info>("car_info",5,                        //订阅了两个节点的消息  车和摄像头回传的消息
                         boost::bind(&armor_detect_node::car_callback, this, _1));
-
-        pub_armor_ = n.advertise<moss_msgs::armor_info>("armor_info", 5);
+                                                                                        //上面的两个订阅 触发回调函数应该也是按照订阅消息的顺序
+        pub_armor_ = n.advertise<detect::armor_goal>("armor_info", 5);                  //发布关于装甲的消息
     }
 
-    void armor_callback(const sensor_msgs::ImageConstPtr& msg);
-    void car_callback(const moss_msgs::car_info::ConstPtr &gimbal_info);
+    void armor_callback(const sensor_msgs::ImageConstPtr& msg);     //由摄像头节点回传的消息触发该回调函数 这边基本上就是原来旧版的装甲识别 还有很多没有搬过来的
+    void car_callback(const serial::car_info::ConstPtr &gimbal_info);      //由车回传的云台消息触发该回传函数 
+
+    
+    
+
 
 private:
     image_transport::Subscriber sub_img_;
     ros::Subscriber sub_yaw_;
     ros::Publisher  pub_armor_;
 
-    moss_msgs::armor_info armor_info_;
+    detect::armor_goal armor_info;
     int detected;
     
-    double gimbal_yaw_;
-    double gimbal_pitch_;
+    geometry_msgs::Point32 armor_pos_;      //代替原先的armor_pos 后面跟下划线是在过程中声明的变量
     
-    //ArmorDetector armor_detect_;
-    //std::vector<armor_info> multi_armors_;
+    std::string param_file_path;
+
+    ArmorDetector armor_detect_;
+    std::vector<cv::RotatedRect> multi_armors_;
+
+    void reset_armor_pos_();
+
 };
+
+//将camera_info和car_info结合起来 否则现在car_info用不上
+class mix_cam_and_car
+{
+public:
+    mix_cam_and_car()
+    {}
+
+    double ptz_yaw   = 0.0;
+    double ptz_pitch = 0.0;
+}
+
+
 
 } // namespace detect_mul
 

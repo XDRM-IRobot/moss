@@ -42,6 +42,9 @@ bool AngleSolver::getAngle(const cv::RotatedRect & rect,
         std::cout << "out of distance range: [" << min_distance << ", " << max_distance << "] distance: " << vel << std::endl;
         return false;
     }
+    
+    
+
     position_in_ptz = r_camera_ptz * position_in_camera - t_camera_ptz;
    
     adjustPTZ2Barrel(position_in_ptz, angle_x, angle_y, bullet_speed);

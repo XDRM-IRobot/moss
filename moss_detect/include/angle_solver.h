@@ -36,7 +36,8 @@ class AngleSolver {
     double ptz_camera_y;
     double ptz_camera_z;
     double offset_y_barrel_ptz;
-   
+    
+    double dist //结算距离
     double z_scale;
     double min_distance;
     double max_distance;
@@ -84,6 +85,8 @@ public:
         detect_mul["min_distance"]            >> min_distance;
         detect_mul["max_distance"]            >> max_distance;
         detect_mul["offset_y_barrel_ptz"]     >> offset_y_barrel_ptz;
+        dist = 0.0;
+    
 
         std::cout << "Camera_Matrix Size: " << cam_matrix.size() << std::endl;
         std::cout << "Distortion_Coefficients Size: " << dist_coeffs.size() << std::endl;

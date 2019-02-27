@@ -119,7 +119,8 @@ cv::RotatedRect ArmorDetector::boundingRRectSlow(const cv::RotatedRect & left, c
 	return RotatedRect(center, Size2f(width, height), angle * 180 / CV_PI);
 }
 
-void ArmorDetector::DetectLights(const cv::Mat &src, std::vector<cv::RotatedRect> &lights) {
+void ArmorDetector::DetectLights(const cv::Mat &src, std::vector<cv::RotatedRect> &lights) 
+{
 	// speed_test_reset();
 #ifdef SHOW_DEBUG_IMG	
   	show_lights_before_filter_ = cv::Mat::zeros(src.size(), CV_8UC3);
@@ -296,6 +297,8 @@ void ArmorDetector::choose_target_from_lights(std::vector<cv::RotatedRect> &ligh
 					LINE("[快速移动] armor")
 					armor_info armor(possible_rect, armor_twist);
 					armor_vector.push_back(armor);
+					
+					
 				} // get_armor
 			}// 2个严格平行
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -925,7 +928,7 @@ float ArmorDetector::get_armor_roi(cv::RotatedRect& rect, bool visual)
 		return 0;
 }
 
-void ArmorDetector::FilterArmors(std::vector<armor_info> &armors) 
+void ArmorDetector::FilterArmors(std::vector<cv::RotatedRect> &armors) 
 {
   	// speed_test_reset();
 	std::vector<bool> is_armor(armors.size(), true);
@@ -1015,14 +1018,14 @@ static int cnt = 0;  // 临时写的，用同一段视频调试时，根据有�
 
 bool ArmorDetector::detect(cv::Mat & src, std::vector<armor_info> & armors_candidate) {
 	// speed_test_reset();
-	std::vector<cv::RotatedRect> lights;
-    DetectLights(src, lights);   //  5ms
+	std::vector<cv::RotatedRect> lights;		//进来先找灯条 （灯条的容器）
+    DetectLights(src, lights);   //  5ms		应该没问题 这边返回灯条的矩形
 	if (lights.size() > 200) return false; // 防止被敌方激光瞄到视野（画面内太多红光确实会一下子灯条数量爆表，然后程序崩掉）
-	FilterLights(lights);        //  0.1ms
+	FilterLights(lights);        //  0.1ms		估计也没问题 过滤一下灯条
 
 	if (lights.size() > 1)
 	{
-		choose_target_from_lights(lights, armors_candidate);  // 0.001 ms
+		choose_target_from_lights(lights, armors_candidate);  // 0.001 ms		灯条匹配 改完了
 		// for(auto armor : armors_candidate) draw_rotated_rect(src, armor.rect, Scalar(0,0,255), 2);
 		// std::cout << "before filter:" << armors_candidate.size() <<std::endl;
 		/*
@@ -1034,7 +1037,7 @@ bool ArmorDetector::detect(cv::Mat & src, std::vector<armor_info> & armors_candi
 			putText(src, str, armors_candidate[i].rect.center, CV_FONT_HERSHEY_COMPLEX_SMALL, 1, CV_RGB(0,205,0), 1);
 		}
 		*/
-		FilterArmors(armors_candidate);
+		FilterArmors(armors_candidate);		//貌似本来就没问题
 		/*
 		for(int i =0;i < armors_candidate.size();++i)
 		{
