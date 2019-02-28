@@ -21,8 +21,8 @@ namespace roborts_sdk {
 Handle::Handle(std::string serial_port) {
   device_ = std::make_shared<SerialDevice>(serial_port, 921600);
   protocol_ = std::make_shared<Protocol>(device_);
-
 }
+
 bool Handle::Init(){
   if (!device_->Init()) {
     std::cerr<<"Can not open device. ";

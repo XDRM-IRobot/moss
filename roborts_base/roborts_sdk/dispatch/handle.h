@@ -22,39 +22,31 @@
 #include "execution.h"
 #include <vector>
 
-namespace roborts_sdk {
+namespace roborts_sdk 
+{
+
 class SubscriptionBase;
 class PublisherBase;
 class ClientBase;
 class ServiceBase;
 class Executor;
 
-template<typename Cmd>
-class Subscription;
-template<typename Cmd>
-class Publisher;
-template<typename Cmd, typename Ack>
-class Client;
-template<typename Cmd, typename Ack>
-class Service;
+template<typename Cmd>               class Subscription;
+template<typename Cmd>               class Publisher;
+template<typename Cmd, typename Ack> class Client;
+template<typename Cmd, typename Ack> class Service;
+
 /**
  * @brief Handle class in the dispatch layer
  */
 class Handle : public std::enable_shared_from_this<Handle> {
   //TODO: make this singleton
  public:
-  template<typename Cmd>
-  friend
-  class Subscription;
-  template<typename Cmd>
-  friend
-  class Publisher;
-  template<typename Cmd, typename Ack>
-  friend
-  class Client;
-  template<typename Cmd, typename Ack>
-  friend
-  class Service;
+  template<typename Cmd>               friend class Subscription;
+  template<typename Cmd>               friend class Publisher;
+  template<typename Cmd, typename Ack> friend class Client;
+  template<typename Cmd, typename Ack> friend class Service;
+
   /**
    * @brief Constructor of Handle, instantiate the object of the hardware layer and protocol layer
    * @param serial_port

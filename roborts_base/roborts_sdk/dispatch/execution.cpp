@@ -27,7 +27,7 @@ void Executor::ExecuteSubscription(std::shared_ptr<SubscriptionBase> subscriptio
   auto message_header = subscription->CreateMessageHeader();
   std::shared_ptr<void> message = subscription->CreateMessage();
 
-  bool ret = GetHandle()->GetProtocol()->Take(
+  bool ret = GetHandle()->GetProtocol()->Take( 
       subscription->GetCommandInfo().get(),
       message_header.get(),
       message.get());
