@@ -24,7 +24,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "../utilities/log.h"
 #include "hardware_interface.h"
 
 namespace roborts_sdk {

@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "protocol.h"
+#include <iostream>
 
 namespace roborts_sdk {
 
@@ -94,24 +95,24 @@ void Protocol::AutoRepeatSendCheck() {
           if (cmd_session_table_[i].retry_time > 0) {
 
             if (cmd_session_table_[i].sent >= cmd_session_table_[i].retry_time) {
-              DLOG_ERROR << "Sending timeout, Free session "
+              std::cout << "Sending timeout, Free session "
                          << static_cast<int>(cmd_session_table_[i].session_id);
               FreeCMDSession(&cmd_session_table_[i]);
             } else {
-              DLOG_ERROR << "Retry session "
+              std::cout << "Retry session "
                          << static_cast<int>(cmd_session_table_[i].session_id);
               DeviceSend(cmd_session_table_[i].memory_block_ptr->memory_ptr);
               cmd_session_table_[i].pre_time_stamp = current_time_stamp;
               cmd_session_table_[i].sent++;
             }
           } else {
-            DLOG_ERROR << "Send once " << i;
+            std::cout << "Send once " << i;
             DeviceSend(cmd_session_table_[i].memory_block_ptr->memory_ptr);
             cmd_session_table_[i].pre_time_stamp = current_time_stamp;
           }
           memory_pool_ptr_->UnlockMemory();
         } else {
-//        DLOG_INFO<<"Wait for timeout Session: "<< i;
+//        std::cout<<"Wait for timeout Session: "<< i;
         }
       }
     }
@@ -144,7 +145,7 @@ bool Protocol::Take(const CommandInfo *command_info,
                     void *message_data) {
   if (buffer_pool_map_.count(std::make_pair(command_info->cmd_set,
                                             command_info->cmd_id)) == 0) {
-//    DLOG_ERROR<<"take failed";
+//    std::cout<<"take failed";
     return false;
   } else {
     //1 time copy
@@ -156,21 +157,21 @@ bool Protocol::Take(const CommandInfo *command_info,
     }
 
     if (memcmp(command_info, &(container.command_info), sizeof(command_info)) != 0) {
-      DLOG_ERROR << "Take command of "<<command_info->cmd_set<<command_info->cmd_id<<" does not match the command received";
+      std::cout << "Take command of "<<command_info->cmd_set<<command_info->cmd_id<<" does not match the command received";
       if (int(container.command_info.receiver) !=int(command_info->receiver)){
-        DLOG_ERROR << "Requested receiver: "<<container.command_info.receiver<<", Get receiver: "<<command_info->receiver;
+        std::cout << "Requested receiver: "<<container.command_info.receiver<<", Get receiver: "<<command_info->receiver;
       }
 
       if (int(container.command_info.sender) !=int(command_info->sender)){
-        DLOG_ERROR << "Requested sender: "<<container.command_info.sender<<", Get sender: "<<command_info->sender;
+        std::cout << "Requested sender: "<<container.command_info.sender<<", Get sender: "<<command_info->sender;
       }
 
       if (int(container.command_info.need_ack) !=int(command_info->need_ack)){
-        DLOG_ERROR << "Requested need_ack: "<<container.command_info.need_ack<<", Get need_ack: "<<command_info->need_ack;
+        std::cout << "Requested need_ack: "<<container.command_info.need_ack<<", Get need_ack: "<<command_info->need_ack;
       }
 
       if (int(container.command_info.length) !=int(command_info->length)){
-        DLOG_ERROR << "Requested length: "<<container.command_info.length<<", Get length: "<<command_info->length;
+        std::cout << "Requested length: "<<container.command_info.length<<", Get length: "<<command_info->length;
       }
 
       return false;
@@ -229,7 +230,7 @@ CMDSession *Protocol::AllocCMDSession(CMDSessionMode session_mode, uint16_t size
     if (cmd_session_table_[(uint16_t) session_mode].usage_flag == 0) {
       i = static_cast<uint32_t>(session_mode);
     } else {
-      DLOG_ERROR << "session " << static_cast<uint32_t>(session_mode) << " is busy\n";
+      std::cout << "session " << static_cast<uint32_t>(session_mode) << " is busy\n";
       return nullptr;
     }
   } else {
@@ -248,12 +249,12 @@ CMDSession *Protocol::AllocCMDSession(CMDSessionMode session_mode, uint16_t size
     if (memory_block_ptr == nullptr) {
       cmd_session_table_[i].usage_flag = 0;
     } else {
-//      DLOG_INFO<<"find "<<i;
+//      std::cout<<"find "<<i;
       cmd_session_table_[i].memory_block_ptr = memory_block_ptr;
       return &cmd_session_table_[i];
     }
   } else {
-    DLOG_INFO << "All usable CMD session id are occupied";
+    std::cout << "All usable CMD session id are occupied";
   }
 
   return nullptr;
@@ -275,7 +276,7 @@ ACKSession *Protocol::AllocACKSession(uint8_t receiver, uint16_t session_id, uin
 
     memory_block_ptr = memory_pool_ptr_->AllocMemory(size);
     if (memory_block_ptr == nullptr) {
-      DLOG_ERROR << "there is not enough memory";
+      std::cout << "there is not enough memory";
       return nullptr;
     } else {
       ack_session_table_[receiver][session_id - 1].memory_block_ptr = memory_block_ptr;
@@ -305,7 +306,7 @@ bool Protocol::SendCMD(uint8_t cmd_set, uint8_t cmd_id, uint8_t receiver,
 
   //calculate pack_length first
   if (data_length == 0 || data_ptr == nullptr) {
-    DLOG_ERROR << "No data send.";
+    std::cout << "No data send.";
     return false;
   }
   pack_length = HEADER_LEN +
@@ -323,7 +324,7 @@ bool Protocol::SendCMD(uint8_t cmd_set, uint8_t cmd_id, uint8_t receiver,
       if (cmd_session_ptr == nullptr) {
         //unlock
         memory_pool_ptr_->UnlockMemory();
-        DLOG_ERROR << "Allocate CMD session failed.";
+        std::cout << "Allocate CMD session failed.";
         return false;
       }
 
@@ -364,7 +365,7 @@ bool Protocol::SendCMD(uint8_t cmd_set, uint8_t cmd_id, uint8_t receiver,
       if (cmd_session_ptr == nullptr) {
         //unlock
         memory_pool_ptr_->UnlockMemory();
-        DLOG_ERROR << "Allocate CMD session failed.";
+        std::cout << "Allocate CMD session failed.";
         return false;
       }
 
@@ -416,7 +417,7 @@ bool Protocol::SendCMD(uint8_t cmd_set, uint8_t cmd_id, uint8_t receiver,
       if (cmd_session_ptr == nullptr) {
         //unlock
         memory_pool_ptr_->UnlockMemory();
-        DLOG_ERROR << "Allocate CMD session failed.";
+        std::cout << "Allocate CMD session failed.";
         return false;
       }
 
@@ -460,7 +461,7 @@ bool Protocol::SendCMD(uint8_t cmd_set, uint8_t cmd_id, uint8_t receiver,
       memory_pool_ptr_->UnlockMemory();
       break;
 
-    default:DLOG_ERROR << "session mode is not valid";
+    default:std::cout << "session mode is not valid";
       return false;
   }
 
@@ -483,7 +484,7 @@ bool Protocol::SendACK(uint8_t session_id, uint16_t seq_num, uint8_t receiver,
   }
 
   if (session_id == 0 || session_id > 31) {
-    DLOG_ERROR << ("ack session id should be from 1 to 31.");
+    std::cout << ("ack session id should be from 1 to 31.");
     return false;
   } else {
 
@@ -494,7 +495,7 @@ bool Protocol::SendACK(uint8_t session_id, uint16_t seq_num, uint8_t receiver,
     if (ack_session_ptr == nullptr) {
       //unlock
       memory_pool_ptr_->UnlockMemory();
-      DLOG_ERROR << "Allocate ACK session failed.";
+      std::cout << "Allocate ACK session failed.";
       return false;
     }
 
@@ -542,11 +543,11 @@ bool Protocol::DeviceSend(uint8_t *buf) {
   ans = serial_device_ptr_->Write(buf, header_ptr->length);
 
   if (ans <= 0) {
-    DLOG_ERROR << "Port failed.";
+    std::cout << "Port failed.";
   } else if (ans != header_ptr->length) {
-    DLOG_ERROR << "Port send failed, send length:" << ans << "package length" << header_ptr->length;
+    std::cout << "Port send failed, send length:" << ans << "package length" << header_ptr->length;
   } else {
-    DLOG_INFO << "Port send success.";
+    std::cout << "Port send success.";
     return true;
   }
   return false;
@@ -621,7 +622,7 @@ bool Protocol::StreamHandler(uint8_t byte) {
     recv_stream_ptr_->recv_buff[recv_stream_ptr_->recv_index] = byte;
     recv_stream_ptr_->recv_index++;
   } else {
-    LOG_ERROR << "Buffer overflow";
+    std::cout << "Buffer overflow";
     memset(recv_stream_ptr_->recv_buff, 0, recv_stream_ptr_->recv_index);
     recv_stream_ptr_->recv_index = 0;
   }
@@ -778,7 +779,7 @@ bool Protocol::ContainerHandler() {
 
             case ACKSessionStatus::ACK_SESSION_PROCESS:
 
-              DLOG_INFO << "Wait for app ack for session " << header_ptr->session_id;
+              std::cout << "Wait for app ack for session " << header_ptr->session_id;
               break;
 
             case ACKSessionStatus::ACK_SESSION_USING:
@@ -815,7 +816,7 @@ bool Protocol::ContainerHandler() {
               break;
 
             default:
-              DLOG_ERROR << "Wrong ACK session status which is out of 0-2";
+              std::cout << "Wrong ACK session status which is out of 0-2";
           }
 
         }

@@ -34,7 +34,7 @@ void Executor::ExecuteSubscription(std::shared_ptr<SubscriptionBase> subscriptio
   if (ret) {
     subscription->HandleMessage(message_header, message);
   } else {
-//      DLOG_ERROR<<"take message failed!";
+//      std::cerr<<"take message failed!";
   }
   //TODO: add return message;
   //subscription->return_message(message);
@@ -50,7 +50,7 @@ void Executor::ExecuteService(std::shared_ptr<ServiceBase> service) {
   if (ret) {
     service->HandleRequest(request_header, request);
   } else {
-    DLOG_ERROR << "take request failed!";
+    std::cerr << "take request failed!";
   }
 }
 void Executor::ExecuteClient(std::shared_ptr<ClientBase> client) {
@@ -65,7 +65,7 @@ void Executor::ExecuteClient(std::shared_ptr<ClientBase> client) {
   if (ret) {
     client->HandleResponse(request_header, response);
   } else {
-//      DLOG_ERROR<<"take response failed!";
+//      std::cerr<<"take response failed!";
   }
 }
 }

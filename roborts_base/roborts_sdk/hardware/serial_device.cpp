@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "serial_device.h"
+#include <iostream>
 
 namespace roborts_sdk {
 SerialDevice::SerialDevice(std::string port_name,
@@ -32,17 +33,17 @@ SerialDevice::~SerialDevice() {
 
 bool SerialDevice::Init() {
 
-  DLOG_INFO << "Attempting to open device " << port_name_ << " with baudrate " << baudrate_;
+  std::cout << "Attempting to open device " << port_name_ << " with baudrate " << baudrate_;
   if (port_name_.c_str() == nullptr) {
     port_name_ = "/dev/ttyUSB0";
   }
   if (OpenDevice() && ConfigDevice()) {
     FD_ZERO(&serial_fd_set_);
     FD_SET(serial_fd_, &serial_fd_set_);
-    DLOG_INFO << "...Serial started successfully.";
+    std::cout << "...Serial started successfully.";
     return true;
   } else {
-    DLOG_ERROR << "...Failed to start serial "<<port_name_;
+    std::cerr << "...Failed to start serial "<<port_name_;
     CloseDevice();
     return false;
   }
@@ -59,7 +60,7 @@ bool SerialDevice::OpenDevice() {
 #endif
 
   if (serial_fd_ < 0) {
-    DLOG_ERROR << "cannot open device " << serial_fd_ << " " << port_name_;
+    std::cerr << "cannot open device " << serial_fd_ << " " << port_name_;
     return false;
   }
 
@@ -80,7 +81,7 @@ bool SerialDevice::ConfigDevice() {
   int i, j;
   /* save current port parameter */
   if (tcgetattr(serial_fd_, &old_termios_) != 0) {
-    DLOG_ERROR << "fail to save current port";
+    std::cerr << "fail to save current port";
     return false;
   }
   memset(&new_termios_, 0, sizeof(new_termios_));
@@ -148,7 +149,7 @@ bool SerialDevice::ConfigDevice() {
 
   /* activite the configuration */
   if ((tcsetattr(serial_fd_, TCSANOW, &new_termios_)) != 0) {
-    DLOG_ERROR << "failed to activate serial configuration";
+    std::cerr << "failed to activate serial configuration";
     return false;
   }
   return true;
@@ -163,11 +164,11 @@ int SerialDevice::Read(uint8_t *buf, int len) {
   } else {
     ret = read(serial_fd_, buf, len);
     while (ret == 0) {
-      LOG_ERROR << "Connection closed, try to reconnect.";
+      std::cout << "Connection closed, try to reconnect.";
       while (!Init()) {
         usleep(500000);
       }
-      LOG_INFO << "Reconnect Success.";
+      std::cout << "Reconnect Success.";
       ret = read(serial_fd_, buf, len);
     }
     return ret;

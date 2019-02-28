@@ -20,6 +20,7 @@
 #include "../protocol/protocol.h"
 #include "dispatch.h"
 #include "execution.h"
+#include <vector>
 
 namespace roborts_sdk {
 class SubscriptionBase;

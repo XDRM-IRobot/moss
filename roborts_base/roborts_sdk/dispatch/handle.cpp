@@ -25,11 +25,11 @@ Handle::Handle(std::string serial_port) {
 }
 bool Handle::Init(){
   if (!device_->Init()) {
-    LOG_ERROR<<"Can not open device. ";
+    std::cerr<<"Can not open device. ";
     return false;
   }
   if (!protocol_->Init()) {
-    LOG_ERROR<<"Protocol initialization failed.";
+    std::cerr<<"Protocol initialization failed.";
     return false;
   }
   return true;

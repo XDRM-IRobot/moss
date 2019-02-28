@@ -166,7 +166,7 @@ class Publisher : public PublisherBase {
   void Publish(Cmd &message) {
     bool ret = GetHandle()->GetProtocol()->SendMessage(GetCommandInfo().get(), &message);
     if (!ret) {
-      DLOG_ERROR << "send message failed!";
+      std::cerr << "send message failed!";
     }
   }
 };
@@ -253,7 +253,7 @@ class Client : public ClientBase {
     std::lock_guard<std::mutex> lock(pending_requests_mutex_);
     bool ret = GetHandle()->GetProtocol()->SendRequest(GetCommandInfo().get(), request.get());
     if (!ret) {
-      DLOG_ERROR << "async_send_request failed!";
+      std::cerr << "async_send_request failed!";
     }
 
     SharedPromise call_promise = std::make_shared<Promise>();
@@ -337,7 +337,7 @@ class Service : public ServiceBase {
     bool ret = GetHandle()->GetProtocol()->SendResponse(GetCommandInfo().get(), request_header.get(), response.get());
 
     if (!ret) {
-      DLOG_ERROR << "send response failed!";
+      std::cerr << "send response failed!";
     }
   }
 
